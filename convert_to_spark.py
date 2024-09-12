@@ -97,7 +97,7 @@ def add_member_over_65(df:pd.DataFrame)->pd.DataFrame:
   return df
 
 
-def add_gov_provider(df:pd.DataFrame)->pd.DataFrame:
+def add_non_us_gov_provider(df:pd.DataFrame)->pd.DataFrame:
   """
   Args:
       df (pd.DataFrame): _description_
@@ -106,7 +106,24 @@ def add_gov_provider(df:pd.DataFrame)->pd.DataFrame:
       pd.DataFrame: _description_
   """
   
-  df["mpd_grped"] = df["mpd_grped"].apply(lambda x: "AB" if x in ["A", "B"] else x)
+  df["non_us_provider"] = df["perf_prov_type_cd"].apply(lambda x: 1 if x.strip() == "1M" else 0)
   
   return df
 
+def add_service_cd_check(df:pd.DataFrame)->pd.DataFrame:
+  """
+  Args:
+      df (pd.DataFrame): Pandas DataFrame
+      spark (_type_): _description_
+
+  Returns:
+      pd.DataFrame: Pandas DataFrame
+  """
+
+  svcd_lst = ["svc_revenue", "svc_procd", "svc_diag_cd"]
+  
+  for col in svcd_lst:
+    
+    df[col] = df[col].apply(lambda x: 0.0 if (x.strip() == "" or pd.isna(x)) else 1.0)
+  
+  return df
